@@ -8,7 +8,6 @@ const signup = async (req, res) => {
     const { email, password, githubProfile, linkedinProfile, firstName, lastName } = req.body;
     const session = driver.session();
     try {
-        // Check if user already exists in MongoDB
         let user = await User.findOne({ email });
         if (user) {
             return res.status(400).json({ msg: 'User already exists' });
@@ -18,33 +17,27 @@ const signup = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Create a new user document in MongoDB with first name and last name
         user = new User({
             email,
             password: hashedPassword,
             githubProfile,
             linkedinProfile,
-            firstName,   // Adding first name
-            lastName     // Adding last name
+            firstName,
+            lastName
         });
 
-        // Save user to MongoDB
         await user.save();
 
-        // Add user to Neo4j using only the MongoDB _id (userId)
-        const userId = user._id.toString(); // MongoDB _id
+        const userId = user._id.toString();
         const result = await session.run(
-            'CREATE (u:User {id: $userId}) RETURN u', // Only using userId for Neo4j node
+            'CREATE (u:User {id: $userId}) RETURN u',
             { userId }
         );
 
-        // Retrieve the created user from Neo4j
         const createdUser = result.records[0].get('u').properties;
 
-        // Close the Neo4j session
         session.close();
 
-        // Respond with success
         res.status(201).json({
             message: 'User created successfully',
             user: createdUser,

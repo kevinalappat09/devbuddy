@@ -27,7 +27,7 @@ const searchLanguage = async (req, res) => {
         const usersWithScores = users.map(user => {
             const userScore = result.records.find(record => record.get('userId') === user.userId);
             return {
-                userId: user._id.toString(), // Ensure userId is included
+                userId: user._id.toString(),
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,

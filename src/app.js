@@ -3,10 +3,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 const cors = require('cors');
 
-// Config imports
 const connectDB = require('./config/mongo');
 
-// Route imports
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes')
 const recommendationRoutes = require('./routes/recommendationRoutes');

@@ -5,10 +5,8 @@ const { getProfile, getInitPreferences, connectUsers, getConnectedUsers } = requ
 
 const router = express.Router();
 
-// Route to get profile information
 router.get('/profile', auth, getProfile);
 
-// Route to get the init_preferences of the user
 router.get('/init-preferences', auth, getInitPreferences);
 
 router.post('/connect/:userIdToConnect', auth, connectUsers);

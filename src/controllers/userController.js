@@ -2,17 +2,14 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { driver } = require('../config/neo4j');
 
-// Function to get profile information of a user
 const getProfile = async (req, res) => {
   try {
-    // Use findById to directly fetch the user based on the _id
     const user = await User.findById(req.user).select('-password');
 
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
 
-    // Send profile information
     res.status(200).json({
       firstName: user.firstName,
       lastName: user.lastName,
@@ -26,17 +23,14 @@ const getProfile = async (req, res) => {
   }
 };
 
-// Function to get the init_preferences value for the user
 const getInitPreferences = async (req, res) => {
   try {
-    // Use findById to fetch only the init_preferences field
     const user = await User.findById(req.user).select('init_preferences');
 
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
 
-    // Send init_preferences value
     res.status(200).json({
       init_preferences: user.init_preferences,
     });
@@ -84,7 +78,6 @@ const connectUsers = async (req, res) => {
 const getConnectedUsers = async (req, res) => {
   const session = driver.session();
   try {
-    // Decode token to get the authenticated user ID
     const token = req.header('x-auth-token');
     if (!token) {
       return res.status(401).json({ message: 'Authorization token required' });
@@ -93,20 +86,17 @@ const getConnectedUsers = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId;
 
-    // Ensure the user exists in MongoDB (optional, for extra validation)
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Neo4j query to get first-degree connections
     const result = await session.run(
       `MATCH (u:User {id: $userId})-[:CONNECTED]->(connectedUser:User)
        RETURN connectedUser.id AS userId, connectedUser.firstName AS firstName, connectedUser.lastName AS lastName, connectedUser.githubUrl AS githubUrl, connectedUser.linkedinUrl AS linkedinUrl`,
       { userId }
     );
 
-    // Map result records to an array of connected users
     const connectedUsers = result.records.map(record => ({
       userId: record.get('userId'),
       firstName: record.get('firstName'),
