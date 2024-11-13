@@ -2,10 +2,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const { driver, session } = require('../config/neo4j');
+const { driver } = require('../config/neo4j');
 
 const signup = async (req, res) => {
     const { email, password, githubProfile, linkedinProfile, firstName, lastName } = req.body;
+    const session = driver.session();
     try {
         // Check if user already exists in MongoDB
         let user = await User.findOne({ email });
