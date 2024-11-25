@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    blacklistUser: [{ type: String }],
+    blacklistLanguages: [{ type: String }],
+    whitelistUser: [{ type: String }],
+    whitelistLanguages: [{ type: String }],
 });
 
 module.exports = mongoose.model('User', userSchema);
